@@ -81,19 +81,22 @@ void initProblem()
 		int tmp;
 		cin >> tmp;
 		elec[tmp] = true;
-
 	}
+	cout << "\nProblem input completed\n";
+	
+}
+void inputSolution()
+{
+	/*
 	cout<<"\nInput electricity charge numbers and time:\n"; // stay time
+	int rt;
 	cin>>rt;
 	for (re i=0;i<rt;i++){
 		int tmp1, tmp2, tmp3;
 		cin>>tmp1>>tmp2>>tmp3;
 		stayTime[tmp1][tmp2] = tmp3;
 	}
-	cout << "\nProblem input completed\n";
-}
-void inputSolution()
-{
+	*/
 	cout << "Input Solution:\n";
 	for (re i = 0; i < m; i++)
 	{
@@ -149,11 +152,16 @@ double evaluator(int sol[MAXM][MAXN], int len[])// solution[], length[] -> doubl
 		}
 		for (re i = 0; i < m; i++)
 		{
-			if (elec[pos]){
-				elc[i] += interval * (charge + consume);
+			double chargetime = 0;
+			if (!elec[pos]){
+				elc[i] -= interval * consume;
+				//elc[i] += interval * (charge + consume);
+			}else{
+				chargetime = (100 - elc[i]) / charge;
+				elc[i] = 100;
 			}
 			countDown[i] -= interval;//倒计时减少
-			elc[i] -= interval * consume;
+			
 			if (elc[i] < 0){
 				return -1;
 			}
@@ -167,13 +175,13 @@ double evaluator(int sol[MAXM][MAXN], int len[])// solution[], length[] -> doubl
 					if (due[i] < len[i] - 1)//没走完就继续走
 					{
 						sum[pos] -= ability[i];//更新sum[]
-						countDown[i] = t[pos][sol[i][1 + due[i]]];//路程所需时间
-						timing.insert(now + t[pos][sol[i][1 + due[i]]]);//到达的时间点
+						countDown[i] = t[pos][sol[i][1 + due[i]]] + chargetime;//路程所需时间
+						timing.insert(now + t[pos][sol[i][1 + due[i]]] + chargetime);//到达的时间点
 						due[i]++;//到下一个点
 						sum[pos] += ability[i];//更新sum[]
 					}
 				}
-				timing.insert(iinh[pos] / (sum[pos] - inhIncrement[pos]) + now);//任务完成的时间点
+				timing.insert(iinh[pos] / (sum[pos] - inhIncrement[pos]) + now + chargetime);//任务完成的时间点
 			}
 		}
 		last = now;//更新last

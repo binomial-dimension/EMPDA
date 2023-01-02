@@ -37,6 +37,7 @@ int dis(int x1, int x2, int y1, int y2){
 int xpos[MAXN], ypos[MAXN], inc[MAXN], inh[MAXN], ability[MAXM];
 int diss[MAXN][MAXN];
 int main(){
+    cout << "Please Input point numbers and robot numbers: m, n\n";
     int n = read(),m = read();
     if (n>=MAXN||m>=MAXM) return 0;
     srand(time(0));

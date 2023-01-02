@@ -55,7 +55,7 @@ void readProblem(){
         ability[i] = read();
     }
 }
-void coutProblem(){
+void coutSolution(){
     for (re i = 0; i < m;i++){
         cout << solution[i].size() << ' ';
         for (re j = 0; j < solution[i].size(); j++){
@@ -130,14 +130,108 @@ bool greedy1(){
 }
 
 bool greedy2(int membernum){
-
+    int elc[MAXM];
+    int abl[MAXM];
+    int now[MAXM];
+    vector<int> tasks[MAXM];
+    int done[MAXM];
+    ms(done, 0);
+    ms(abl, 0);
+    ms(now, 0);
+    int t = 0;
+    int tk[MAXM];
+    ms(tk, 0);
+    bool visited[MAXM];
+    ms(visited, 0);
+    for (re i = 0; i < m;i++){
+        elc[(i) / membernum] = 100;
+        abl[(i) / membernum] += ability[i];
+    }
+    int teams = (int)((m-1) / membernum) + 1;
+    for (re i = 0; i < teams;i++){
+        tasks[i].push_back(0);
+    }
+    int turn = 0;
+    visited[0] = true;
+    while(nearPoint(0, visited) != -1){
+        int tmp = nearPoint(now[turn], visited);
+        tasks[turn].push_back(tmp);
+        visited[tmp] = true;
+        now[turn] = tmp;
+        turn++;
+        turn %= teams;
+    }
+    ms(visited, 0);
+    ms(now, 0);
+    int counter = 100000;
+    
+    while (nearPoint(0, visited) != -1)
+    {
+        counter--;
+        if (counter<0){
+            cout << "FATAL: no solution" << endl;
+            return false;
+        }
+        for (re k = 0; k < teams;k++){
+            if (done[k] >= tasks[k].size()) continue;
+            if (tk[k] * inc[now[k]] + inh[now[k]] < 0)
+                visited[now[k]] = true;
+            int to = tasks[k][done[k]];
+            if (to == -1)
+                break;
+            if ((diss[now[k]][to] + diss[to][0]) * consume > elc[k])
+            {
+                to = 0;
+            }
+            if (tk[k] * inc[now[k]] + inh[now[k]] + diss[now[k]][0] * consume <= elc[k] / consume){
+                if (!visited[now[k]]){
+                    
+                    tk[k] += (tk[k] * inc[now[k]] + inh[now[k]]) / abl[k];
+                }
+                if (tasks[k][done[k]] == now[k] && visited[now[k]]) done[k]++;
+                visited[now[k]] = true;
+            }else if (diss[now[k]][0] <= elc[k] / consume){
+                int frag = elc[k]/consume - diss[now[k]][0];
+                tk[k] += frag;
+                inh[now[k]] -= frag * abl[k];
+                to = 0;
+            }else{
+                to = 0;
+            }
+            elc[k] -= diss[now[k]][to] * consume;
+            for (re j = 0; j < m;j++){
+                if (solution[j].size() > 0 && to == 0 && solution[j][solution[j].size()-1] == 0){
+                    continue;
+                }
+                solution[j].push_back(to);
+            }
+            now[k] = to;
+            tk[k] += diss[now[k]][to];
+            if (to == 0){
+                tk[k] += (100 - elc[k]) / charge;
+                elc[k] = 100;
+            }
+            t = max(t, tk[k]);
+        }
+    }
+        
+    cout << "\ntime consume: " << t << endl;
+    return true;
 }
 
 int main(){
     readProblem();
-    if(greedy1()){
-        coutProblem();
-    };
+    if (true){
+        if(greedy1()){
+            coutSolution();
+        };
+    }else{
+        if (greedy2(5)){
+            coutSolution();
+        }
+    }
+    
+    
     
     system("pause");
     return 0;
